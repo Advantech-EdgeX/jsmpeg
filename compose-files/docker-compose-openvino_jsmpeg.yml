@@ -1,0 +1,13 @@
+
+version: '3.4'
+
+services:
+  jsmpeg:
+    image: advantech1234/openvino_jsmpeg:1.0.0
+    ports:
+      - "7879:7879"
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882"
+    container_name: ov_jsmpeg
+    hostname: ov_jsmpeg
