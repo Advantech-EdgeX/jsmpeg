@@ -3,7 +3,7 @@ version: '3.4'
 
 services:
   jsmpeg:
-    image: advantech1234/openvino_jsmpeg:1.0.0
+    image: advantech1234/openvino_jsmpeg:1.0.1
     ports:
       - "7879:7879"
       - "7880:7880"
