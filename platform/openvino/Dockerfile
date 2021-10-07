@@ -17,5 +17,9 @@ RUN echo ${GIT_COMMIT} > version.git
 RUN ln -s /root/jsmpeg/tool/ffmpeg /usr/local/bin/ffmpeg
 RUN ln -s /root/jsmpeg/tool/jq-linux64 /usr/local/bin/jq
 RUN ln -s /root/jsmpeg/tool/curl /usr/local/bin/curl
+RUN rm -f index.html
+RUN ln -s /root/jsmpeg/platform/openvino/index.html index.html
+RUN rm -f env.json
+RUN ln -s /root/jsmpeg/platform/openvino/env.json env.json
 
-CMD [ "/root/jsmpeg/start_http_ws.sh"]
+CMD [ "/root/jsmpeg/platform/openvino/start_http_ws.sh"]

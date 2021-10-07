@@ -11,6 +11,6 @@ git archive --format=tar --prefix=archive/ HEAD | tar xf -
 
 GIT_COMMIT=$(git log -1 --oneline --decorate=short)
 echo docker build --build-arg GIT_COMMIT="$GIT_COMMIT" -t "$1" .
-docker build --build-arg GIT_COMMIT="$GIT_COMMIT" -t "$1" .
+docker build -f platform/openvino/Dockerfile --build-arg GIT_COMMIT="$GIT_COMMIT" -t "$1" .
 
 rm -rf archive/

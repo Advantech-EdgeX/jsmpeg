@@ -19,8 +19,7 @@ run_jobs() {
 	do
 		curl -v -X DESCRIBE -m 3 $URL_RTSP > /dev/null 2>&1
 		if [ "$?" -eq 0 ]; then
-			# echo ffmpeg -nostdin -rtsp_transport tcp -i $URL_RTSP -f mpegts -codec:v mpeg1video  "http://${rtsp_ip}:${ws_relay_port_src}/supersecret"
-			ffmpeg -nostdin -rtsp_transport tcp -i $URL_RTSP -r 30 -q 0 -f mpegts -codec:v mpeg1video  "http://${rtsp_ip}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
+			ffmpeg -nostdin -rtsp_transport tcp -i $URL_RTSP -r 30 -q 0 -f mpegts -codec:v mpeg1video "http://${HOST_IP}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
 			sleep 1
 		else
 			sleep 3
@@ -53,14 +52,16 @@ else
 	done
 fi
 
+DEFAULT_ROUTE=$(ip route show default | awk '/default/ {print $3}')
+echo DEFAULT_ROUTE=${DEFAULT_ROUTE} >> ${LOG}
+if [ ! -z "${DEFAULT_ROUTE}" ]; then
+	HOST_IP=${DEFAULT_ROUTE}
+else
+	HOST_IP="127.0.0.1"
+fi
+
 if [ -z "${rtsp_ip}" ]; then
-	DEFAULT_ROUTE=$(ip route show default | awk '/default/ {print $3}')
-	echo DEFAULT_ROUTE=${DEFAULT_ROUTE} >> ${LOG}
-	if [ ! -z "${DEFAULT_ROUTE}" ]; then
-		rtsp_ip=${DEFAULT_ROUTE}
-	else
-		rtsp_ip="127.0.0.1"
-	fi
+	rtsp_ip=${HOST_IP}
 fi
 
 URL_RTSP="rtsp://${rtsp_ip}:${rtsp_port}/${rtsp_url_path}"
