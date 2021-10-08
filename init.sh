@@ -19,6 +19,8 @@ run_jobs() {
 	do
 		curl -v -X DESCRIBE -m 3 $URL_RTSP > /dev/null 2>&1
 		if [ "$?" -eq 0 ]; then
+			# nvds
+			# ffmpeg -nostdin -i $URL_RTSP -f mpegts -codec:v mpeg1video "http://${HOST_IP}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
 			ffmpeg -nostdin -rtsp_transport tcp -i $URL_RTSP -r 30 -q 0 -f mpegts -codec:v mpeg1video "http://${HOST_IP}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
 			sleep 1
 		else
