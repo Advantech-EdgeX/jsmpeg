@@ -19,9 +19,11 @@ run_jobs() {
 	do
 		curl -v -X DESCRIBE -m 3 $URL_RTSP > /dev/null 2>&1
 		if [ "$?" -eq 0 ]; then
-			# nvds
-			# ffmpeg -nostdin -i $URL_RTSP -f mpegts -codec:v mpeg1video "http://${HOST_IP}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
-			ffmpeg -nostdin -rtsp_transport tcp -i $URL_RTSP -r 30 -q 0 -f mpegts -codec:v mpeg1video "http://${HOST_IP}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
+			if [ "$PLATFORM" = "nvds" ]; then
+				ffmpeg -nostdin -i $URL_RTSP -f mpegts -codec:v mpeg1video "http://${HOST_IP}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
+			else
+				ffmpeg -nostdin -rtsp_transport tcp -i $URL_RTSP -r 30 -q 0 -f mpegts -codec:v mpeg1video "http://${HOST_IP}:${ws_relay_port_src}/supersecret" >/dev/null 2>&1
+			fi
 			sleep 1
 		else
 			sleep 3
@@ -29,14 +31,29 @@ run_jobs() {
 	done
 }
 
+cat /dev/null > ${LOG}
+echo "arg number $#" >> ${LOG}
+echo "args $@" >> ${LOG}
+
 case "$1" in
 	-h | --help)
 		display_help
 		exit 0
 		;;
+	-p | --platform)
+		if [ -n "$2" ]; then
+			echo "handle arg -p value $2" >> ${LOG}
+			PLATFORM=${2}
+			rm -f /root/jsmpeg/index.html
+			ln -s /root/jsmpeg/platform/${2}/index.html /root/jsmpeg/index.html
+			rm -f /root/jsmpeg/env.json
+			ln -s /root/jsmpeg/platform/${2}/env.json /root/jsmpeg/env.json
+			shift
+		fi
+		shift
+		;;
 esac
 
-cat /dev/null > ${LOG}
 if [ "$#" -eq 4 ]; then
 	rtsp_ip=$1
 	rtsp_port=$2

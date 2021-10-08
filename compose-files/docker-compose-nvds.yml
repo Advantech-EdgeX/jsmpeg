@@ -9,13 +9,15 @@ services:
       - "7880:7880"
       - "7881:7881"
       - "7882:7882"
-    container_name: nvds_jsmpeg
-    hostname: nvds_jsmpeg
+    container_name: jsmpeg_nv
+    hostname: jsmpeg_nv
+    environment:
+          - platform=nvds
 
   mqtt-broker:
     image: advantech1234/nvds_jsmpeg_mosquitto:1.0.0
     ports:
       - "7883:7883"
       - "7884:7884"
-    container_name: nvds_jsmpeg_mosquitto
-    hostname: nvds_jsmpeg_mosquitto
+    container_name: jsmpeg_nv_mosquitto
+    hostname: jsmpeg_nv_mosquitto

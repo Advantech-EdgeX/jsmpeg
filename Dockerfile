@@ -1,5 +1,6 @@
 FROM node:16.3-alpine3.13 AS builder
 ARG GIT_COMMIT
+ENV platform openvino
 
 WORKDIR /root
 
@@ -17,9 +18,5 @@ RUN echo ${GIT_COMMIT} > version.git
 RUN ln -s /root/jsmpeg/tool/ffmpeg /usr/local/bin/ffmpeg
 RUN ln -s /root/jsmpeg/tool/jq-linux64 /usr/local/bin/jq
 RUN ln -s /root/jsmpeg/tool/curl /usr/local/bin/curl
-RUN rm -f index.html
-RUN ln -s /root/jsmpeg/platform/openvino/index.html index.html
-RUN rm -f env.json
-RUN ln -s /root/jsmpeg/platform/openvino/env.json env.json
 
-CMD [ "/root/jsmpeg/init.sh"]
+CMD ["sh", "-c", "/root/jsmpeg/init.sh -p ${platform}"]
