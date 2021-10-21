@@ -31,45 +31,117 @@ run_jobs() {
 	done
 }
 
+arg_rtsp_ip=
+arg_rtsp_port=
+arg_ws_relay_port_src=
+arg_ws_relay_port_dst=
+arg_rtsp_url_path=
+
 cat /dev/null > ${LOG}
 echo "arg number $#" >> ${LOG}
 echo "args $@" >> ${LOG}
 
-case "$1" in
-	-h | --help)
-		display_help
-		exit 0
-		;;
-	-p | --platform)
-		if [ -n "$2" ]; then
-			echo "handle arg -p value $2" >> ${LOG}
-			PLATFORM=${2}
-			rm -f /root/jsmpeg/index.html
-			ln -s /root/jsmpeg/platform/${2}/index.html /root/jsmpeg/index.html
-			rm -f /root/jsmpeg/env.json
-			ln -s /root/jsmpeg/platform/${2}/env.json /root/jsmpeg/env.json
+while [[ "$#" -gt 0 ]]; do
+	echo "handle arg $1 value $2" >> ${LOG}
+	case "$1" in
+		-h | --help)
+			display_help
+			exit 0
+			;;
+		-p | --platform)
+			if [ -n "$2" ]; then
+				case "$2" in
+					-*)
+						echo "argument platform have no value!!!" >> ${LOG}
+						exit 1
+						;;
+					*)
+						PLATFORM=${2}
+						rm -f /root/jsmpeg/index.html
+						ln -s /root/jsmpeg/platform/${2}/index.html /root/jsmpeg/index.html
+						rm -f /root/jsmpeg/env.json
+						ln -s /root/jsmpeg/platform/${2}/env.json /root/jsmpeg/env.json
+						shift ;;
+				esac
+			fi
 			shift
-		fi
-		shift
-		;;
-esac
+			;;
+		--rtsp_ip)
+			if [ -n "$2" ]; then
+				case "$2" in
+					-*) ;;
+					*)
+						arg_rtsp_ip=${2}
+						shift ;;
+				esac
+			fi
+			shift
+			;;
+		--rtsp_port)
+			if [ -n "$2" ]; then
+				case "$2" in
+					-*) ;;
+					*)
+						arg_rtsp_port=${2}
+						shift ;;
+				esac
+			fi
+			shift
+			;;
+		--ws_relay_port_src)
+			if [ -n "$2" ]; then
+				case "$2" in
+					-*) ;;
+					*)
+						arg_ws_relay_port_src=${2}
+						shift ;;
+				esac
+			fi
+			shift
+			;;
+		--ws_relay_port_dst)
+			if [ -n "$2" ]; then
+				case "$2" in
+					-*) ;;
+					*)
+						arg_ws_relay_port_dst=${2}
+						shift ;;
+				esac
+			fi
+			shift
+			;;
+		--rtsp_url_path)
+			if [ -n "$2" ]; then
+				case "$2" in
+					-*) ;;
+					*)
+						arg_rtsp_url_path=${2}
+						shift ;;
+				esac
+			fi
+			shift
+			;;
+		*)
+			shift
+                        ;;
+        esac
+done
 
-if [ "$#" -eq 4 ]; then
-	rtsp_ip=$1
-	rtsp_port=$2
-	ws_relay_port_src=$3
-	ws_relay_port_dst=$4
-else
-	while [ ! -f "${DIR_JSMPEG}/env.json" ]
-	do
-		sleep 3
-	done
-	echo "Use ${DIR_JSMPEG}/env.json" >> ${LOG}
-	for s in $(jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" ${DIR_JSMPEG}/env.json); do
-		echo $s >> ${LOG}
-		export $s
-	done
-fi
+while [ ! -f "${DIR_JSMPEG}/env.json" ]
+do
+	sleep 3
+done
+echo "Use ${DIR_JSMPEG}/env.json" >> ${LOG}
+for s in $(jq -r "to_entries|map(\"\(.key)=\(.value|tostring)\")|.[]" ${DIR_JSMPEG}/env.json); do
+	echo $s >> ${LOG}
+	export $s
+done
+
+[ -n "$arg_rtsp_ip" ] && rtsp_ip=$arg_rtsp_ip
+[ -n "$arg_rtsp_port" ] && rtsp_port=$arg_rtsp_port
+[ -n "$arg_ws_relay_port_src" ] && ws_relay_port_src=$arg_ws_relay_port_src
+[ -n "$arg_ws_relay_port_dst" ] && ws_relay_port_dst=$arg_ws_relay_port_dst
+[ -n "$arg_rtsp_url_path" ] && rtsp_url_path=$arg_rtsp_url_path
 
 DEFAULT_ROUTE=$(ip route show default | awk '/default/ {print $3}')
 echo DEFAULT_ROUTE=${DEFAULT_ROUTE} >> ${LOG}
